@@ -14,13 +14,19 @@ public class UserMapper implements DefaultMapper<UserForm, UserDTO, User> {
         return User.builder()
             .firstName(userForm.getFirstName())
             .lastName(userForm.getLastName())
+            .email(userForm.getEmail())
             .password(userForm.getPassword())
             .build();
     }
 
     @Override
     public UserDTO dtoFromDomain(User user) {
-        return null;
+        return UserDTO.builder()
+            .id(user.getId())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .build();
     }
 
     @Override

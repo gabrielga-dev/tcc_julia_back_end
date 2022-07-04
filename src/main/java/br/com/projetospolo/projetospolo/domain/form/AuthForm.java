@@ -22,6 +22,6 @@ public class AuthForm {
     private String password;
 
     public UsernamePasswordAuthenticationToken convert() {
-        return new UsernamePasswordAuthenticationToken(email,password);
+        return new UsernamePasswordAuthenticationToken(email, password);
     }
 }
