@@ -1,8 +1,8 @@
 package br.com.projetospolo.projetospolo.application.service;
 
-import br.com.projetospolo.projetospolo.application.mapper.UserMapper;
 import br.com.projetospolo.projetospolo.domain.dto.UserDTO;
 import br.com.projetospolo.projetospolo.domain.form.UserForm;
+import br.com.projetospolo.projetospolo.domain.mapper.UserMapper;
 import br.com.projetospolo.projetospolo.domain.repository.UserRepository;
 import br.com.projetospolo.projetospolo.domain.type.RoleType;
 import br.com.projetospolo.projetospolo.infrastructure.exception.BusinessException;

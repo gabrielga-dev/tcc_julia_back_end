@@ -3,6 +3,7 @@ package br.com.projetospolo.projetospolo.infrastructure.controller;
 import br.com.projetospolo.projetospolo.application.service.TokenService;
 import br.com.projetospolo.projetospolo.application.service.UserAuthService;
 import br.com.projetospolo.projetospolo.domain.dto.AuthDTO;
+import br.com.projetospolo.projetospolo.domain.dto.UserDTO;
 import br.com.projetospolo.projetospolo.domain.form.AuthForm;
 import br.com.projetospolo.projetospolo.infrastructure.exception.BusinessException;
 import br.com.projetospolo.projetospolo.util.ExceptionDescriptionConstants;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,5 +45,10 @@ public class AuthenticationController {
                 .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_USER_NOT_FOUND)
                 .build();
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<UserDTO> findAuth(){
+        return ResponseEntity.ok().body(userAuthService.getAuthenticatedUser());
     }
 }
