@@ -50,7 +50,7 @@ public class UserServiceImpl extends UserService {
         toSave.setCreationDate(LocalDateTime.now());
         toSave.setRoles(
             Set.of(
-                roleService.readById(
+                roleService.findById(
                     userForm.isInterno()
                         ? RoleType.INTERNO.getId()
                         : RoleType.EXTERNO.getId()
@@ -103,7 +103,7 @@ public class UserServiceImpl extends UserService {
 
     @Override
     public Page<UserDTO> read(UserForm filter, Pageable pageable) {
-        return null;
+        return null;//todo implementar
     }
 
     @Override
