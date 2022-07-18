@@ -9,7 +9,7 @@ public enum ProjectSituationType {
 
     NOT_STARTED("Não iniciado"),
     STARTED("Iniciado"),
-    FINISHED("Finalziado");
+    FINISHED("Finalizado");
 
     private final String description;
 }
