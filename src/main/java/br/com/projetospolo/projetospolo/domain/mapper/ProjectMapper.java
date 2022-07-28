@@ -30,6 +30,7 @@ public class ProjectMapper implements DefaultMapper<ProjectForm, ProjectDTO, Pro
     @Override
     public ProjectDTO dtoFromDomain(Project project) {
         return ProjectDTO.builder()
+            .id(project.getId())
             .name(project.getName())
             .description(project.getDescription())
             .projectSituation(project.getProjectSituation().getDescription())
@@ -47,6 +48,13 @@ public class ProjectMapper implements DefaultMapper<ProjectForm, ProjectDTO, Pro
 
     @Override
     public Project transferInformation(Project source, Project destiny) {
-        return null;
+        destiny.setName(source.getName());
+        destiny.setName(source.getName());
+        destiny.setDescription(source.getDescription());
+        destiny.setMaxParticipants(source.getMaxParticipants());
+        destiny.setProjectSituation(source.getProjectSituation());
+        destiny.setStartDate(source.getStartDate());
+        destiny.setEndDate(source.getEndDate());
+        return destiny;
     }
 }

@@ -5,6 +5,7 @@ import br.com.projetospolo.projetospolo.domain.filter.ProjectFilter;
 import br.com.projetospolo.projetospolo.domain.form.ProjectForm;
 import br.com.projetospolo.projetospolo.domain.mapper.ProjectMapper;
 import br.com.projetospolo.projetospolo.domain.repository.ProjectRepository;
+import br.com.projetospolo.projetospolo.domain.type.ProjectSituationType;
 import br.com.projetospolo.projetospolo.infrastructure.exception.BusinessException;
 import br.com.projetospolo.projetospolo.infrastructure.service.ProjectService;
 import br.com.projetospolo.projetospolo.util.ExceptionDescriptionConstants;
@@ -16,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -60,7 +60,7 @@ public class ProjectServiceImpl extends ProjectService {
                 .build();
         }
 
-        savedProject = mapper.transferInformation(savedProject, mapper.domainFromForm(projectForm));
+        savedProject = mapper.transferInformation(mapper.domainFromForm(projectForm), savedProject);
         savedProject = repository.save(savedProject);
 
         return mapper.dtoFromDomain(savedProject);
@@ -68,10 +68,18 @@ public class ProjectServiceImpl extends ProjectService {
 
     @Override
     public Page<ProjectDTO> read(ProjectFilter filter, Pageable pageable) {
-        var isProjectSituationNotNull = Optional.ofNullable(filter.getProjectSituation()).isPresent();
+        var isSituationPresent = Objects.nonNull(filter.getProjectSituation());
+        var optSituation = ProjectSituationType.getProjectSituationTypeByDescription(filter.getProjectSituation());
+        ProjectSituationType situation = null;
+
+        if (isSituationPresent && optSituation.isPresent()) {
+            situation = optSituation.get();
+        }
+
         return repository.filter(
+                filter.getId(),
                 filter.getName(),
-                isProjectSituationNotNull ? filter.getProjectSituation().name() : null,
+                situation,
                 filter.getStartDate(),
                 filter.getEndDate(),
                 pageable

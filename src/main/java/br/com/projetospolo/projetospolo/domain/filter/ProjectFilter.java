@@ -1,6 +1,5 @@
 package br.com.projetospolo.projetospolo.domain.filter;
 
-import br.com.projetospolo.projetospolo.domain.type.ProjectSituationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,9 +15,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class ProjectFilter {
 
+    private Long id;
+
     private String name;
 
-    private ProjectSituationType projectSituation;
+    private String projectSituation;
 
     private Date startDate;
 
