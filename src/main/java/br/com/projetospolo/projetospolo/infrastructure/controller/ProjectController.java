@@ -25,6 +25,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -76,6 +77,14 @@ public class ProjectController {
         @RequestBody @Valid ProjectForm projectForm
     ) {
         return ResponseEntity.ok(projectService.update(id, projectForm));
+    }
+
+    @PutMapping("/{id}/participants")
+    public ResponseEntity<ProjectDTO> updateParticipants(
+        @PathVariable @Positive(message = "O valor do id deve ser positivo") @Valid Long id,
+        @RequestBody List<Long> participantsIds
+    ) {
+        return ResponseEntity.ok(projectService.updateParticipants(id, participantsIds));
     }
 
     @DeleteMapping("/{id}")

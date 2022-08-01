@@ -9,6 +9,8 @@ import br.com.projetospolo.projetospolo.infrastructure.service.crud.FindByIdServ
 import br.com.projetospolo.projetospolo.infrastructure.service.crud.ReadService;
 import br.com.projetospolo.projetospolo.infrastructure.service.crud.UpdateService;
 
+import java.util.List;
+
 public abstract class ProjectService
     implements
     CreateService<ProjectForm, ProjectDTO>,
@@ -17,4 +19,5 @@ public abstract class ProjectService
     UpdateService<ProjectForm, Long, ProjectDTO>,
     DeleteService<Long>
 {
+    public abstract ProjectDTO updateParticipants(Long projectId, List<Long> participantsIds);
 }

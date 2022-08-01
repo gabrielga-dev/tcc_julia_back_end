@@ -14,4 +14,11 @@ public final class ExceptionDescriptionConstants {
     public static final String EXEPTION_DESCRIPTION_PROJECT_NOT_FOUND = "Não foi encontrado um projeto com tais credenciais.";
     public static final String EXEPTION_DESCRIPTION_ROLE_NOT_FOUND = "Não foi encontrada uma role com tais credenciais.";
 
+    public static String EXEPTION_DESCRIPTION_PROJECT_MAX_PARTICIPANTS_EXCEEDED(Integer maximun, Integer current) {
+        return String.format(
+            "Para o projeto em questão, é permitido até %d participantes, foi requisitado %d.",
+            maximun, current
+        );
+    }
+
 }

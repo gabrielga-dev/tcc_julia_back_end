@@ -5,6 +5,7 @@ import br.com.projetospolo.projetospolo.domain.filter.ProjectFilter;
 import br.com.projetospolo.projetospolo.domain.form.ProjectForm;
 import br.com.projetospolo.projetospolo.domain.mapper.ProjectMapper;
 import br.com.projetospolo.projetospolo.domain.repository.ProjectRepository;
+import br.com.projetospolo.projetospolo.domain.repository.UserRepository;
 import br.com.projetospolo.projetospolo.domain.type.ProjectSituationType;
 import br.com.projetospolo.projetospolo.infrastructure.exception.BusinessException;
 import br.com.projetospolo.projetospolo.infrastructure.service.ProjectService;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -28,6 +31,7 @@ public class ProjectServiceImpl extends ProjectService {
     private final ProjectMapper mapper;
 
     private final ProjectRepository repository;
+    private final UserRepository userRepository;
 
     @Override
     public ProjectDTO create(ProjectForm projectForm) {
@@ -111,6 +115,37 @@ public class ProjectServiceImpl extends ProjectService {
                     .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_PROJECT_NOT_FOUND)
                     .build()
             );
+        return mapper.dtoFromDomain(savedProject);
+    }
+
+    @Override
+    public ProjectDTO updateParticipants(Long projectId, List<Long> participantsIds) {
+        var savedProject = repository.findById(projectId).orElseThrow(
+            () -> BusinessException.builder()
+                .code(String.valueOf(HttpStatus.NOT_FOUND.value()))
+                .message(ExceptionMessageConstants.EXEPTION_MESSAGE_DATA_NOT_FOUND)
+                .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_PROJECT_NOT_FOUND)
+                .build()
+        );
+
+        if(savedProject.getMaxParticipants().compareTo(participantsIds.size()) < 0){
+            throw BusinessException.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .message(ExceptionMessageConstants.EXEPTION_MESSAGE_UNACCEPTACLE_DATA)
+                .description(
+                    ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_PROJECT_MAX_PARTICIPANTS_EXCEEDED(
+                        savedProject.getMaxParticipants(), participantsIds.size()
+                    )
+                )
+                .build();
+        }
+
+        var newParticipants =  userRepository.findAllById(participantsIds);
+
+        savedProject.getParticipants().clear();
+        savedProject.setParticipants(new HashSet<>(newParticipants));
+        savedProject = repository.save(savedProject);
+
         return mapper.dtoFromDomain(savedProject);
     }
 }
