@@ -54,7 +54,7 @@ public class UserServiceImpl extends UserService {
         toSave.setRoles(
             Set.of(
                 roleService.findById(
-                    userForm.isInterno()
+                    userForm.isIntern()
                         ? RoleType.INTERNO.getId()
                         : RoleType.EXTERNO.getId()
                 )

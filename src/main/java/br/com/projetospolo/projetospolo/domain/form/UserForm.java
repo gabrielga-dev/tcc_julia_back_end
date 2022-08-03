@@ -38,5 +38,5 @@ public class UserForm implements Serializable {
     private String password;
 
     @NotNull(message = "A flag do tipo do usuário não pode ser nula.")
-    private boolean interno;
+    private boolean intern;
 }
