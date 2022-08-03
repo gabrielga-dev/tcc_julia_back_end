@@ -6,6 +6,7 @@ import br.com.projetospolo.projetospolo.domain.mapper.UserMapper;
 import br.com.projetospolo.projetospolo.domain.repository.UserRepository;
 import br.com.projetospolo.projetospolo.domain.type.RoleType;
 import br.com.projetospolo.projetospolo.infrastructure.exception.BusinessException;
+import br.com.projetospolo.projetospolo.infrastructure.service.ProjectService;
 import br.com.projetospolo.projetospolo.infrastructure.service.RoleService;
 import br.com.projetospolo.projetospolo.infrastructure.service.UserService;
 import br.com.projetospolo.projetospolo.util.ExceptionDescriptionConstants;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class UserServiceImpl extends UserService {
 
     private final UserAuthService authService;
     private final RoleService roleService;
+    private final ProjectService projectService;
 
     private final UserRepository repository;
 
@@ -50,7 +53,7 @@ public class UserServiceImpl extends UserService {
         toSave.setCreationDate(LocalDateTime.now());
         toSave.setRoles(
             Set.of(
-                roleService.readById(
+                roleService.findById(
                     userForm.isInterno()
                         ? RoleType.INTERNO.getId()
                         : RoleType.EXTERNO.getId()
@@ -103,7 +106,7 @@ public class UserServiceImpl extends UserService {
 
     @Override
     public Page<UserDTO> read(UserForm filter, Pageable pageable) {
-        return null;
+        return null;//todo implementar
     }
 
     @Override
@@ -111,4 +114,21 @@ public class UserServiceImpl extends UserService {
 
     }
 
+    @Override
+    public Page<UserDTO> getAllUsersLeft(Long projectId, Pageable pageable) {
+
+        var projectParticipants = projectService.findById(projectId).getParticipants();
+
+        if(projectParticipants.isEmpty()){
+            return repository.findAll(pageable).map(mapper::dtoFromDomain);
+        }
+        var participantsIn = projectParticipants
+            .stream()
+            .map(UserDTO::getId)
+            .collect(Collectors.toList());
+
+        var usersLeft = repository.getUsersNotIn(participantsIn, pageable);
+
+        return usersLeft.map(mapper::dtoFromDomain);
+    }
 }

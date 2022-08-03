@@ -1,4 +1,4 @@
-package br.com.projetospolo.projetospolo.domain.dto;
+package br.com.projetospolo.projetospolo.domain.filter;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,30 +7,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.Set;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectDTO {
+public class ProjectFilter {
 
     private Long id;
 
     private String name;
-
-    private String description;
-
-    private Integer maxParticipants;
 
     private String projectSituation;
 
     private Date startDate;
 
     private Date endDate;
-
-    private UserDTO owner;
-
-    private Set<UserDTO> participants;
 }

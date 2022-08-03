@@ -5,6 +5,7 @@ import br.com.projetospolo.projetospolo.domain.form.UserForm;
 import br.com.projetospolo.projetospolo.infrastructure.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.net.URI;
 
@@ -47,6 +50,15 @@ public class UserController {
         Pageable pageable
     ){
         return ResponseEntity.ok(userService.read(filter, pageable));
+    }
+
+    @GetMapping("/left/{projectId}")
+    public ResponseEntity<Page<UserDTO>> getAllUsersLeft(
+        @PathVariable Long projectId,
+        @RequestParam @Min(0) Integer page,
+        @RequestParam @Min(5) Integer quantityPerPage
+    ){
+        return ResponseEntity.ok(userService.getAllUsersLeft(projectId, PageRequest.of(page, quantityPerPage)));
     }
 
     @PutMapping("/{id}")

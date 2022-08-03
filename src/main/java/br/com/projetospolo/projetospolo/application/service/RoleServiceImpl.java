@@ -17,7 +17,7 @@ public class RoleServiceImpl extends RoleService {
     private final RoleRepository repository;
 
     @Override
-    public Role readById(Long id) {
+    public Role findById(Long id) {
         return repository.findById(id)
             .orElseThrow(
                 () -> BusinessException.builder()
