@@ -3,6 +3,7 @@ package br.com.projetospolo.projetospolo.domain.mapper;
 import br.com.projetospolo.projetospolo.domain.dto.RoleDTO;
 import br.com.projetospolo.projetospolo.domain.dto.UserDTO;
 import br.com.projetospolo.projetospolo.domain.form.UserForm;
+import br.com.projetospolo.projetospolo.domain.form.UserUpdateForm;
 import br.com.projetospolo.projetospolo.domain.model.User;
 import br.com.projetospolo.projetospolo.infrastructure.mapper.DefaultMapper;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,15 @@ public class UserMapper implements DefaultMapper<UserForm, UserDTO, User> {
 
     @Override
     public User domainFromForm(UserForm userForm) {
+        return User.builder()
+            .firstName(userForm.getFirstName())
+            .lastName(userForm.getLastName())
+            .email(userForm.getEmail())
+            .password(userForm.getPassword())
+            .build();
+    }
+
+    public User domainFromUpdateForm(UserUpdateForm userForm) {
         return User.builder()
             .firstName(userForm.getFirstName())
             .lastName(userForm.getLastName())
@@ -42,6 +52,7 @@ public class UserMapper implements DefaultMapper<UserForm, UserDTO, User> {
         destiny.setFirstName(source.getFirstName());
         destiny.setLastName(source.getLastName());
         destiny.setEmail(source.getEmail());
+        destiny.setPassword(source.getPassword());
         return destiny;
     }
 }

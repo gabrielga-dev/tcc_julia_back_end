@@ -18,6 +18,23 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByEmail(String email);
 
-    @Query("SELECT user from User user WHERE user.id NOT IN (:ids)")
+    @Query("SELECT user from User user WHERE user.id NOT IN (:ids) AND user.active = 1 ")
     Page<User> getUsersNotIn(@Param("ids") List<Long> ids, Pageable pageable);
+
+    @Query("select user from User user " +
+        "WHERE ((:id Is NULL) OR (user.id = :id)) " +
+        "AND ((:firstName Is NULL) OR (user.firstName LIKE '%:firstName%')) " +
+        "AND ((:lastName Is NULL) OR (user.lastName LIKE '%:lastName%')) " +
+        "AND ((:email Is NULL) OR (user.email LIKE '%:email%')) " +
+        "AND ((:roleId Is NULL) OR (:roleId IN (SELECT role.id FROM user.roles role))) " +
+        "AND user.active = 1 "
+    )
+    Page<User> filter(
+        @Param(value = "id") Long id,
+        @Param(value = "firstName") String firstName,
+        @Param(value = "lastName") String lastName,
+        @Param(value = "email") String email,
+        @Param(value = "roleId") Long roleId,
+        Pageable pageable
+    );
 }

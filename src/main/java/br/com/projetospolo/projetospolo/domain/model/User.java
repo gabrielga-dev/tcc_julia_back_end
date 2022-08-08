@@ -69,6 +69,9 @@ public class User implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
     private Set<Project> projectsAsOwner;
 
+    @Column(name = "active", nullable = false)
+    private boolean active = true;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
@@ -81,22 +84,22 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return this.active;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return this.active;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return this.active;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.active;
     }
 
 }

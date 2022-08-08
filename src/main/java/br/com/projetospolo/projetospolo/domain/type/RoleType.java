@@ -10,4 +10,8 @@ public enum RoleType {
     EXTERNO(2L);
 
     private final Long id;
+
+    public static RoleType getRoleTypeByInternFlag(boolean flag) {
+        return flag ? RoleType.INTERNO : RoleType.EXTERNO;
+    }
 }

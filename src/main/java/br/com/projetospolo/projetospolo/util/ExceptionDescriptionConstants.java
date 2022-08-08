@@ -11,6 +11,8 @@ public final class ExceptionDescriptionConstants {
     public static final String EXEPTION_DESCRIPTION_CANNOT_UPDATE_OTHER_USERS_PROJECT = "Você não pode editar esse proejto pois você não é o responsável por ele.";
     public static final String EXEPTION_DESCRIPTION_CANNOT_DO_THIS = "Você não possui permissão para realizar tal ação.";
     public static final String EXEPTION_DESCRIPTION_USER_NOT_FOUND = "Não foi encontrado um usuário com tais credenciais.";
+    public static final String EXEPTION_DESCRIPTION_UNEXPECTED_ERROR = "Um erro inesperado ocorreu, tente novamente em alguns instantes.";
+    public static final String EXEPTION_DESCRIPTION_PASSWORD_LENGTH = "O campo de senha deve ter de 8 até 100 caracteres.";
     public static final String EXEPTION_DESCRIPTION_PROJECT_NOT_FOUND = "Não foi encontrado um projeto com tais credenciais.";
     public static final String EXEPTION_DESCRIPTION_ROLE_NOT_FOUND = "Não foi encontrada uma role com tais credenciais.";
 
