@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserForm implements Serializable {
+public class UserUpdateForm implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,8 +33,6 @@ public class UserForm implements Serializable {
     @Size(min = 8, max = 100, message = "O campo de email deve ter de 8 até 100 caracteres.")
     private String email;
 
-    @NotNull(message = "O atributo senha não pode ser nulo.")
-    @Size(min = 8, max = 100, message = "O campo de senha deve ter de 8 até 100 caracteres.")
     private String password;
 
     @NotNull(message = "A flag do tipo do usuário não pode ser nula.")

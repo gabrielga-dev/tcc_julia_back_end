@@ -1,7 +1,9 @@
 package br.com.projetospolo.projetospolo.infrastructure.controller;
 
 import br.com.projetospolo.projetospolo.domain.dto.UserDTO;
+import br.com.projetospolo.projetospolo.domain.filter.UserFilter;
 import br.com.projetospolo.projetospolo.domain.form.UserForm;
+import br.com.projetospolo.projetospolo.domain.form.UserUpdateForm;
 import br.com.projetospolo.projetospolo.infrastructure.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,7 +36,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDTO> create(@RequestBody @Valid UserForm user){
+    public ResponseEntity<UserDTO> create(@RequestBody @Valid UserForm user) {
 
         var savedUser = userService.create(user);
         URI uri = ServletUriComponentsBuilder
@@ -46,10 +48,26 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Page<UserDTO>> read(
-        @PathVariable @Valid UserForm filter,
+        @RequestParam(required = false) Long id,
+        @RequestParam(required = false) String firstName,
+        @RequestParam(required = false) String lastName,
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) Boolean intern,
         Pageable pageable
-    ){
+    ) {
+        var filter = UserFilter.builder()
+            .id(id)
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .intern(intern)
+            .build();
         return ResponseEntity.ok(userService.read(filter, pageable));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> findById(@PathVariable("id") Long userId) {
+        return ResponseEntity.ok(userService.findById(userId));
     }
 
     @GetMapping("/left/{projectId}")
@@ -57,22 +75,22 @@ public class UserController {
         @PathVariable Long projectId,
         @RequestParam @Min(0) Integer page,
         @RequestParam @Min(5) Integer quantityPerPage
-    ){
+    ) {
         return ResponseEntity.ok(userService.getAllUsersLeft(projectId, PageRequest.of(page, quantityPerPage)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> update(
         @PathVariable @Positive(message = "O valor do id deve ser positivo") @Valid Long id,
-        @RequestBody @Valid UserForm user
-    ){
+        @RequestBody @Valid UserUpdateForm user
+    ) {
         return ResponseEntity.ok(userService.update(id, user));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
         @PathVariable @Positive(message = "O valor do id deve ser positivo") @Valid Long id
-    ){
+    ) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }

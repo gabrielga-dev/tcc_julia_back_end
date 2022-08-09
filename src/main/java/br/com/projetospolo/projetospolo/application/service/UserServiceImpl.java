@@ -1,8 +1,11 @@
 package br.com.projetospolo.projetospolo.application.service;
 
 import br.com.projetospolo.projetospolo.domain.dto.UserDTO;
+import br.com.projetospolo.projetospolo.domain.filter.UserFilter;
 import br.com.projetospolo.projetospolo.domain.form.UserForm;
+import br.com.projetospolo.projetospolo.domain.form.UserUpdateForm;
 import br.com.projetospolo.projetospolo.domain.mapper.UserMapper;
+import br.com.projetospolo.projetospolo.domain.repository.RoleRepository;
 import br.com.projetospolo.projetospolo.domain.repository.UserRepository;
 import br.com.projetospolo.projetospolo.domain.type.RoleType;
 import br.com.projetospolo.projetospolo.infrastructure.exception.BusinessException;
@@ -32,6 +35,7 @@ public class UserServiceImpl extends UserService {
     private final ProjectService projectService;
 
     private final UserRepository repository;
+    private final RoleRepository roleRepository;
 
     private final UserMapper mapper;
 
@@ -54,7 +58,7 @@ public class UserServiceImpl extends UserService {
         toSave.setRoles(
             Set.of(
                 roleService.findById(
-                    userForm.isInterno()
+                    userForm.isIntern()
                         ? RoleType.INTERNO.getId()
                         : RoleType.EXTERNO.getId()
                 )
@@ -67,7 +71,7 @@ public class UserServiceImpl extends UserService {
     }
 
     @Override
-    public UserDTO update(Long id, UserForm userForm) {
+    public UserDTO update(Long id, UserUpdateForm userForm) {
         var saved = repository.findById(id)
             .orElseThrow(
                 () -> BusinessException.builder()
@@ -77,8 +81,16 @@ public class UserServiceImpl extends UserService {
                     .build()
             );
 
+        if (!saved.isActive()) {
+            throw BusinessException.builder()
+                .httpStatusCode(HttpStatus.BAD_REQUEST)
+                .message(ExceptionMessageConstants.EXEPTION_MESSAGE_DATA_NOT_FOUND)
+                .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_USER_NOT_FOUND)
+                .build();
+        }
+
         var authenticatedUser = authService.getAuth();
-        if(!Objects.equals(authenticatedUser.getUsername(), saved.getUsername())){
+        if (!Objects.equals(authenticatedUser.getUsername(), saved.getUsername())) {
             throw BusinessException.builder()
                 .httpStatusCode(HttpStatus.UNAUTHORIZED)
                 .message(ExceptionMessageConstants.EXEPTION_MESSAGE_UNAUTHORIZED_ACTION)
@@ -86,11 +98,10 @@ public class UserServiceImpl extends UserService {
                 .build();
         }
 
-        var updater = mapper.domainFromForm(userForm);
-        if(
-            !Objects.equals(saved.getUsername(), updater.getUsername()) &&
-                repository.findByEmail(updater.getUsername()).isPresent()
-        ){
+        var updater = mapper.domainFromUpdateForm(userForm);
+        if (
+            (!Objects.equals(saved.getUsername(), updater.getUsername()) && repository.findByEmail(updater.getUsername()).isPresent())
+        ) {
             throw BusinessException.builder()
                 .httpStatusCode(HttpStatus.BAD_REQUEST)
                 .message(ExceptionMessageConstants.EXEPTION_MESSAGE_CREDENTIALS_ALREADY_IN_USE)
@@ -98,20 +109,73 @@ public class UserServiceImpl extends UserService {
                 .build();
         }
 
+        if (Objects.isNull(userForm.getPassword()) || userForm.getPassword().isBlank()) {
+            updater.setPassword(saved.getPassword());
+        } else {
+            var passwordLength = userForm.getPassword().length();
+            if ((8 <= passwordLength) && (passwordLength <= 100)) {
+                updater.setPassword(new BCryptPasswordEncoder().encode(userForm.getPassword()));
+            } else {
+                throw BusinessException.builder()
+                    .httpStatusCode(HttpStatus.BAD_REQUEST)
+                    .message(ExceptionMessageConstants.EXEPTION_MESSAGE_UNACCEPTACLE_DATA)
+                    .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_PASSWORD_LENGTH)
+                    .build();
+            }
+        }
+
         saved = mapper.transferInformation(updater, saved);
+
+        saved.getRoles().clear();
+        saved.getRoles().add(
+            roleService.findById(
+                userForm.isIntern()
+                    ? RoleType.INTERNO.getId()
+                    : RoleType.EXTERNO.getId()
+            )
+        );
 
         var updated = repository.save(saved);
         return mapper.dtoFromDomain(updated);
     }
 
     @Override
-    public Page<UserDTO> read(UserForm filter, Pageable pageable) {
-        return null;//todo implementar
+    public Page<UserDTO> read(UserFilter filter, Pageable pageable) {
+        Long roleId = null;
+        if (Objects.nonNull(filter.getIntern())) {
+            roleId = RoleType.getRoleTypeByInternFlag(filter.getIntern()).getId();
+        }
+        return repository.filter(
+            filter.getId(),
+            filter.getFirstName(),
+            filter.getLastName(),
+            filter.getEmail(),
+            roleId,
+            pageable
+        ).map(mapper::dtoFromDomain);
     }
 
     @Override
     public void delete(Long id) {
+        var toDelete = repository.findById(id).orElseThrow(
+            () -> BusinessException.builder()
+                .httpStatusCode(HttpStatus.BAD_REQUEST)
+                .message(ExceptionMessageConstants.EXEPTION_MESSAGE_DATA_NOT_FOUND)
+                .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_USER_NOT_FOUND)
+                .build()
+        );
 
+        if (!toDelete.isActive()) {
+            throw BusinessException.builder()
+                .httpStatusCode(HttpStatus.BAD_REQUEST)
+                .message(ExceptionMessageConstants.EXEPTION_MESSAGE_DATA_NOT_FOUND)
+                .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_USER_NOT_FOUND)
+                .build();
+        }
+
+        toDelete.setActive(false);
+
+        repository.save(toDelete);
     }
 
     @Override
@@ -119,7 +183,7 @@ public class UserServiceImpl extends UserService {
 
         var projectParticipants = projectService.findById(projectId).getParticipants();
 
-        if(projectParticipants.isEmpty()){
+        if (projectParticipants.isEmpty()) {
             return repository.findAll(pageable).map(mapper::dtoFromDomain);
         }
         var participantsIn = projectParticipants
@@ -130,5 +194,25 @@ public class UserServiceImpl extends UserService {
         var usersLeft = repository.getUsersNotIn(participantsIn, pageable);
 
         return usersLeft.map(mapper::dtoFromDomain);
+    }
+
+    @Override
+    public UserDTO findById(Long id) {
+        var user = repository.findById(id).orElseThrow(
+            () -> BusinessException.builder()
+                .httpStatusCode(HttpStatus.BAD_REQUEST)
+                .message(ExceptionMessageConstants.EXEPTION_MESSAGE_DATA_NOT_FOUND)
+                .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_USER_NOT_FOUND)
+                .build()
+        );
+
+        if (!user.isActive()) {
+            throw BusinessException.builder()
+                .httpStatusCode(HttpStatus.BAD_REQUEST)
+                .message(ExceptionMessageConstants.EXEPTION_MESSAGE_DATA_NOT_FOUND)
+                .description(ExceptionDescriptionConstants.EXEPTION_DESCRIPTION_USER_NOT_FOUND)
+                .build();
+        }
+        return mapper.dtoFromDomain(user);
     }
 }

@@ -4,6 +4,7 @@ import br.com.projetospolo.projetospolo.domain.dto.ProjectDTO;
 import br.com.projetospolo.projetospolo.domain.filter.ProjectFilter;
 import br.com.projetospolo.projetospolo.domain.form.ProjectForm;
 import br.com.projetospolo.projetospolo.domain.mapper.ProjectMapper;
+import br.com.projetospolo.projetospolo.domain.model.User;
 import br.com.projetospolo.projetospolo.domain.repository.ProjectRepository;
 import br.com.projetospolo.projetospolo.domain.repository.UserRepository;
 import br.com.projetospolo.projetospolo.domain.type.ProjectSituationType;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -140,7 +142,10 @@ public class ProjectServiceImpl extends ProjectService {
                 .build();
         }
 
-        var newParticipants =  userRepository.findAllById(participantsIds);
+        var newParticipants =  userRepository.findAllById(participantsIds)
+            .stream()
+            .filter(User::isEnabled)
+            .collect(Collectors.toList());
 
         savedProject.getParticipants().clear();
         savedProject.setParticipants(new HashSet<>(newParticipants));
