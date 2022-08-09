@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class ProjectMapper implements DefaultMapper<ProjectForm, ProjectDTO, Project> {
 
     private final UserMapper userMapper;
+    private final CommentMapper commentMapper;
 
     @Override
     public Project domainFromForm(ProjectForm projectForm) {
@@ -42,6 +43,11 @@ public class ProjectMapper implements DefaultMapper<ProjectForm, ProjectDTO, Pro
                 project.getParticipants().parallelStream().map(
                     userMapper::dtoFromDomain
                 ).collect(Collectors.toSet())
+            )
+            .comments(
+                project.getComments().parallelStream().map(
+                    commentMapper::dtoFromDomain
+                ).collect(Collectors.toList())
             )
             .build();
     }

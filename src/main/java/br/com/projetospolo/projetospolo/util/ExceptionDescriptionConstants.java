@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 public final class ExceptionDescriptionConstants {
 
     public static final String EXEPTION_DESCRIPTION_CREDENTIALS_ALREADY_IN_USE = "Tais credenciais já estão em uso.";
+    public static final String EXEPTION_DESCRIPTION_CANNOT_COMMENT_ON_THIS_PROJECT = "Você não pode comentar em um projeto que você não é participante.";
+    public static final String EXEPTION_DESCRIPTION_CANNOT_COMMENT_MORE_THAN_ONE_TIME = "Você não pode comentar mais de uma vez em um projeto.";
     public static final String EXEPTION_DESCRIPTION_CANNOT_UPDATE_OTHER_USER = "Você não pode editar os dados de outra pessoa, apenas os seus.";
     public static final String EXEPTION_DESCRIPTION_CANNOT_UPDATE_OTHER_USERS_PROJECT = "Você não pode editar esse proejto pois você não é o responsável por ele.";
     public static final String EXEPTION_DESCRIPTION_CANNOT_DO_THIS = "Você não possui permissão para realizar tal ação.";

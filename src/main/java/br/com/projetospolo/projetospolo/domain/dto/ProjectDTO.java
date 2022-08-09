@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -33,4 +34,6 @@ public class ProjectDTO {
     private UserDTO owner;
 
     private Set<UserDTO> participants;
+
+    private List<CommentDTO> comments;
 }
