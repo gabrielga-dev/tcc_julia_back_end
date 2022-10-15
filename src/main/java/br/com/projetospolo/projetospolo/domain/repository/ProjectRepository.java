@@ -32,4 +32,20 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         @Param(value = "endDate") Date endDate,
         Pageable pageable
     );
+
+    @Query("SELECT project FROM Project project " +
+        "WHERE :participantId IN (SELECT participant.id FROM project.participants participant) " +
+        "AND (SELECT COUNT(comment.id) FROM Comment comment WHERE comment.project.id = project.id AND comment.author.id = :participantId) = 0")
+    Page<Project> findProjectsWithoutComments(
+        @Param("participantId") Long participantId,
+        Pageable pageable
+    );
+
+    @Query("SELECT project FROM Project project " +
+        "WHERE project.owner.id = :ownerId " +
+        "AND (SELECT COUNT(comment.id) FROM project.comments comment) > 0")
+    Page<Project> findCommentedProjects(
+        @Param("ownerId") Long ownerId,
+        Pageable pageable
+    );
 }

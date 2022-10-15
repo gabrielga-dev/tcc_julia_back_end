@@ -53,6 +53,7 @@ public class UserServiceImpl extends UserService {
             );
 
         var toSave = mapper.domainFromForm(userForm);
+        toSave.setActive(true);
         toSave.setPassword(new BCryptPasswordEncoder().encode(toSave.getPassword()));
         toSave.setCreationDate(LocalDateTime.now());
         toSave.setRoles(

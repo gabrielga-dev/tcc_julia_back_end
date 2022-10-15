@@ -1,7 +1,9 @@
 package br.com.projetospolo.projetospolo.infrastructure.controller;
 
+import br.com.projetospolo.projetospolo.domain.dto.CommentDTO;
 import br.com.projetospolo.projetospolo.domain.dto.ProjectDTO;
 import br.com.projetospolo.projetospolo.domain.filter.ProjectFilter;
+import br.com.projetospolo.projetospolo.domain.form.CommentForm;
 import br.com.projetospolo.projetospolo.domain.form.ProjectForm;
 import br.com.projetospolo.projetospolo.infrastructure.service.ProjectService;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +66,32 @@ public class ProjectController {
             .endDate(endDate)
             .build();
         return ResponseEntity.ok(projectService.read(filter, PageRequest.of(page, MAX_PROJECTS_PER_PAGE)));
+    }
+
+    @GetMapping("/without-comments")
+    public ResponseEntity<Page<ProjectDTO>> readProjectsWithoutComments(
+        @RequestParam @Min(0) Integer page
+    ) {
+        return ResponseEntity.ok(
+            projectService.readProjectsWithoutComments(page, PageRequest.of(page, MAX_PROJECTS_PER_PAGE))
+        );
+    }
+
+    @GetMapping("/commented")
+    public ResponseEntity<Page<ProjectDTO>> readCommentedProjects(
+        @RequestParam @Min(0) Integer page
+    ) {
+        return ResponseEntity.ok(
+            projectService.readCommentedProjects(page, PageRequest.of(page, MAX_PROJECTS_PER_PAGE))
+        );
+    }
+
+    @PostMapping("/comment/{id}")
+    public ResponseEntity<CommentDTO> comment(
+        @PathVariable("id") Long projectId,
+        @RequestBody @Valid CommentForm comment
+        ) {
+        return ResponseEntity.ok(projectService.comment(comment, projectId));
     }
 
     @GetMapping("/{id}")
